@@ -5,8 +5,10 @@ import { cn } from "@/lib/utils";
 export default function Root() {
   return (
     <>
-      <Outlet />
-      <nav className="fixed bottom-0 left-0 right-0 z-50 h-16 w-full flex items-center justify-around bg-backgroud shadow-[0_-2px_4px_rgba(0,0,0,0.1)]">
+      <main className="h-screen overflow-y-auto pb-16" style={{ scrollbarWidth: "none" }}>
+        <Outlet />
+      </main>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 h-16 w-full flex items-center justify-around bg-white shadow-[0_-2px_4px_rgba(0,0,0,0.1)]">
         <NavLink
           to="/"
           className={({ isActive }) =>
