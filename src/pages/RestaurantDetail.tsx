@@ -8,30 +8,13 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ReviewForm } from '@/components/ReviewForm';
 import { ReviewList } from '@/components/ReviewList';
+import type { RestaurantDetail } from '@/types/restaurant';
 
-interface Restaurant {
-  restaurant_id: number;
-  name: string;
-  address: string;
-  phone?: string;
-  category: string;
-  lat: string;
-  lng: string;
-  local_currency: boolean;
-  goodness: boolean;
-  kind_price: boolean;
-  review_count: number;
-  visit_count: number;
-  restaurant_score: number;
-  one_line_comment: string;
-  menu: [];
-}
-
-const review = ['😡', '😐', '👍', '👍👍', '👍👍👍'];
+const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
 
 export default function RestaurantDetail() {
   const { id } = useParams<{ id: string }>();
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isVisiting, setIsVisiting] = useState(false);
@@ -47,7 +30,7 @@ export default function RestaurantDetail() {
         }
         return response.json();
       })
-      .then((data: Restaurant) => {
+      .then((data: RestaurantDetail) => {
         setRestaurant(data);
         setLoading(false);
       })
@@ -73,7 +56,7 @@ export default function RestaurantDetail() {
         throw new Error(`방문 처리 실패: ${response.status}`);
       }
 
-      setRestaurant((prevRestaurant) => {
+      setRestaurant((prevRestaurant: RestaurantDetail | null) => {
         if (!prevRestaurant) return null;
         return { ...prevRestaurant, visit_count: prevRestaurant.visit_count + 1 };
       });
@@ -93,7 +76,7 @@ export default function RestaurantDetail() {
 
     fetch(`/api/restaurants/${id}`)
       .then((response) => response.json())
-      .then((data: Restaurant) => {
+      .then((data: RestaurantDetail) => {
         setRestaurant(data);
       })
       .catch((err) => {
@@ -127,8 +110,6 @@ export default function RestaurantDetail() {
     );
   }
 
-  const scoreEmoji = review[restaurant.restaurant_score];
-
   return (
     <div className="container mx-auto p-4 md:p-8 max-w-4xl">
       <Card className="mb-6 shadow-lg">
@@ -138,9 +119,12 @@ export default function RestaurantDetail() {
               <CardTitle className="text-3xl md:text-4xl font-bold text-gray-800">{restaurant.name}</CardTitle>
               <CardDescription className="text-lg text-gray-600 mt-1">{restaurant.category}</CardDescription>
             </div>
-            <Badge variant="outline" className="mt-2 md:mt-0 text-2xl p-2 px-4">
-              {scoreEmoji} <span className="ml-2 text-yellow-500">{restaurant.restaurant_score.toFixed(1)}</span>
-            </Badge>
+            <div className="mt-2 md:mt-0 flex flex-col items-end space-y-1">
+              <Badge variant="outline" className="text-2xl p-2 px-4 font-bold">
+                {review[Math.round(restaurant.avg_score)]}{' '}
+                <span className="ml-2 text-yellow-500">{restaurant.avg_score}</span>
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -192,12 +176,12 @@ export default function RestaurantDetail() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-gray-700">리뷰 수:</span>
+              <span className="text-gray-700">리뷰 수</span>
               <span className="font-semibold text-blue-600">{restaurant.review_count}개</span>
             </div>
             <Separator />
             <div className="flex justify-between items-center">
-              <span className="text-gray-700">방문 횟수:</span>
+              <span className="text-gray-700">방문 횟수</span>
               <span className="font-semibold text-green-600">{restaurant.visit_count}회</span>
             </div>
             <Button onClick={handleVisit} disabled={isVisiting} className="w-full mt-4 bg-green-500 hover:bg-green-600">

@@ -6,30 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useDebounce } from '@/hooks/useDebounce';
+import type { Restaurant, RestaurantsResponse } from '@/types/restaurant';
 
-interface Restaurant {
-  restaurant_id: number;
-  name: string;
-  address: string;
-  phone?: string;
-  category: string;
-  lat: string;
-  lng: string;
-  local_currency: boolean;
-  goodness: boolean;
-  kind_price: boolean;
-  review_count: number;
-  visit_count: number;
-  restaurant_score: number;
-}
-
-interface ApiResponse {
-  total_count: number;
-  total_pages: number;
-  current_page: number;
-  items_per_page: number;
-  restaurants: Restaurant[];
-}
+const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
 
 interface MapBounds {
   ne_lat: number;
@@ -37,8 +16,6 @@ interface MapBounds {
   sw_lat: number;
   sw_lng: number;
 }
-
-const review = ['😡', '😐', '👍', '👍👍', '👍👍👍'];
 
 export default function Home() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -67,8 +44,8 @@ export default function Home() {
         }
         return response.json();
       })
-      .then((data: ApiResponse) => {
-        setRestaurants(data.restaurants);
+      .then(({ restaurants }: RestaurantsResponse) => {
+        setRestaurants(restaurants);
       })
       .catch((error) => {
         console.error('Failed to fetch restaurants by bounds:', error);
@@ -113,7 +90,7 @@ export default function Home() {
                   onMouseOver={() => setHoveredRestaurant(restaurant)}
                   onMouseOut={() => setHoveredRestaurant(null)}
                 >
-                  {review[restaurant.restaurant_score]}
+                  {review[Math.round(restaurant.avg_score)]}
                 </Badge>
               </Link>
             </CustomOverlayMap>
