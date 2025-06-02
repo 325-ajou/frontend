@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
-import { Phone, MapPin, Utensils, MessageSquare, CheckCircle } from 'lucide-react';
+import { Phone, MapPin, Utensils, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { ReviewForm } from '@/components/ReviewForm';
+import { ReviewList } from '@/components/ReviewList';
 
 interface Restaurant {
   restaurant_id: number;
@@ -33,6 +35,7 @@ export default function RestaurantDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isVisiting, setIsVisiting] = useState(false);
+  const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -83,6 +86,19 @@ export default function RestaurantDetail() {
     } finally {
       setIsVisiting(false);
     }
+  };
+
+  const handleReviewSubmitted = () => {
+    setReviewRefreshTrigger((prev) => prev + 1);
+
+    fetch(`/api/restaurants/${id}`)
+      .then((response) => response.json())
+      .then((data: Restaurant) => {
+        setRestaurant(data);
+      })
+      .catch((err) => {
+        console.error('식당 정보를 받아올 수 없습니다', err);
+      });
   };
 
   if (loading) {
@@ -192,23 +208,15 @@ export default function RestaurantDetail() {
         </Card>
       </div>
 
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center">
-            <MessageSquare className="w-6 h-6 mr-2 text-indigo-500" />
-            리뷰 ({restaurant.review_count})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {restaurant.one_line_comment && (
-            <div className="mb-4 p-3 bg-indigo-50 rounded-md border border-indigo-200">
-              <p className="text-sm font-semibold text-indigo-700">✨ AI 요약:</p>
-              <p className="text-indigo-600 italic">"{restaurant.one_line_comment}"</p>
-            </div>
-          )}
-          <p className="text-gray-500">리뷰 기능 개발중...</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <ReviewList
+          restaurantId={restaurant.restaurant_id}
+          refreshTrigger={reviewRefreshTrigger}
+          oneLineComment={restaurant.one_line_comment}
+        />
+
+        <ReviewForm restaurantId={restaurant.restaurant_id} onReviewSubmitted={handleReviewSubmitted} />
+      </div>
     </div>
   );
 }
