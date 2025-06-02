@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface Restaurant {
   restaurant_id: number;
@@ -30,14 +31,36 @@ interface ApiResponse {
   restaurants: Restaurant[];
 }
 
+interface MapBounds {
+  ne_lat: number;
+  ne_lng: number;
+  sw_lat: number;
+  sw_lng: number;
+}
+
 const review = ['😡', '😐', '👍', '👍👍', '👍👍👍'];
 
 export default function Home() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [hoveredRestaurant, setHoveredRestaurant] = useState<Restaurant | null>(null);
+  const [mapBounds, setMapBounds] = useState<MapBounds>({
+    ne_lat: 37.280320141059896,
+    ne_lng: 127.04707734473452,
+    sw_lat: 37.27492533638723,
+    sw_lng: 127.0405230907576,
+  });
+
+  const debouncedMapBounds = useDebounce(mapBounds, 500);
 
   useEffect(() => {
-    fetch(`/api/restaurants?page=1`)
+    const params = new URLSearchParams({
+      ne_lat: debouncedMapBounds.ne_lat.toString(),
+      ne_lng: debouncedMapBounds.ne_lng.toString(),
+      sw_lat: debouncedMapBounds.sw_lat.toString(),
+      sw_lng: debouncedMapBounds.sw_lng.toString(),
+    });
+
+    fetch(`/api/restaurants?${params}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`${response.status} Error`);
@@ -46,8 +69,11 @@ export default function Home() {
       })
       .then((data: ApiResponse) => {
         setRestaurants(data.restaurants);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch restaurants by bounds:', error);
       });
-  }, []);
+  }, [debouncedMapBounds]);
 
   return (
     <>
@@ -61,6 +87,19 @@ export default function Home() {
         <Map
           center={{ lat: 37.278431, lng: 127.043809 }}
           className="flex flex-col flex-grow items-center justify-center bg-gray-100"
+          onBoundsChanged={(map) => {
+            console.log('map changed');
+            const bounds = map.getBounds();
+            const sw = bounds.getSouthWest();
+            const ne = bounds.getNorthEast();
+
+            setMapBounds({
+              ne_lat: ne.getLat(),
+              ne_lng: ne.getLng(),
+              sw_lat: sw.getLat(),
+              sw_lng: sw.getLng(),
+            });
+          }}
         >
           {restaurants.map((restaurant) => (
             <CustomOverlayMap
