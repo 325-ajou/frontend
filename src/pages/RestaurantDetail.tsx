@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { Phone, MapPin, Utensils, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -53,9 +54,15 @@ export default function RestaurantDetail() {
       });
 
       if (!response.ok) {
-        throw new Error(`방문 처리 실패: ${response.status}`);
+        if (response.status === 400) {
+          toast.error('오늘 이미 방문한 식당입니다');
+          return;
+        }
+
+        throw new Error(`${response.status}`);
       }
 
+      toast.success('방문 기록이 저장되었습니다!');
       setRestaurant((prevRestaurant: RestaurantDetail | null) => {
         if (!prevRestaurant) return null;
         return { ...prevRestaurant, visit_count: prevRestaurant.visit_count + 1 };
