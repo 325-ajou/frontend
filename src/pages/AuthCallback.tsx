@@ -27,12 +27,12 @@ export default function AuthCallback() {
     if (hasFetchedRef.current) return;
     hasFetchedRef.current = true;
 
-    const requestSession = async (token: string) => {
+    const requestSession = async (auth_code: string) => {
       try {
         const response = await fetch(`/api/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
+          body: JSON.stringify({ auth_code }),
         });
 
         if (!response.ok) {
