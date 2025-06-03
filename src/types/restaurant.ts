@@ -1,3 +1,5 @@
+import type { Menu } from './menu';
+
 export interface Restaurant {
   restaurant_id: number;
   name: string;
@@ -16,8 +18,8 @@ export interface Restaurant {
 }
 
 export interface RestaurantDetail extends Restaurant {
-  menus: string[]; // 메뉴 배열
-  one_line_comment: string; // AI 요약 코멘트
+  menus: Menu[];
+  one_line_comment: string;
 }
 
 export interface RestaurantsResponse {

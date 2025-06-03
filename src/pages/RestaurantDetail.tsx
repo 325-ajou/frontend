@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ReviewForm } from '@/components/ReviewForm';
 import { ReviewList } from '@/components/ReviewList';
+import { MenuList } from '@/components/MenuList';
 import type { RestaurantDetail } from '@/types/restaurant';
 
 const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
@@ -200,6 +201,8 @@ export default function RestaurantDetail() {
       </div>
 
       <div className="space-y-6">
+        <MenuList menus={restaurant.menus} />
+
         <ReviewList
           restaurantId={restaurant.restaurant_id}
           refreshTrigger={reviewRefreshTrigger}
