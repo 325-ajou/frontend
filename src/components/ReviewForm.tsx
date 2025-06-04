@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { StarRating } from '@/components/ui/star-rating';
-import { useAuth } from '@/contexts/AuthContext';
+import { RatingSelector } from '@/components/ui/rating-selector';
 import type { ReviewFormData } from '@/types/review';
 
 interface ReviewFormProps {
@@ -12,7 +12,6 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ restaurantId, onReviewSubmitted }: ReviewFormProps) {
-  const { isLoggedIn } = useAuth();
   const [formData, setFormData] = useState<ReviewFormData>({
     score: 0,
     comment: '',
@@ -23,18 +22,8 @@ export function ReviewForm({ restaurantId, onReviewSubmitted }: ReviewFormProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isLoggedIn) {
-      setError('로그인이 필요합니다.');
-      return;
-    }
-
     if (formData.score === 0) {
-      setError('별점을 선택해주세요.');
-      return;
-    }
-
-    if (formData.comment.trim().length < 5) {
-      setError('리뷰는 최소 5자 이상 작성해주세요.');
+      setError('평점을 선택해주세요.');
       return;
     }
 
@@ -64,22 +53,6 @@ export function ReviewForm({ restaurantId, onReviewSubmitted }: ReviewFormProps)
     }
   };
 
-  if (!isLoggedIn) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-center text-gray-500">
-            리뷰를 작성하려면{' '}
-            <a href="/login" className="text-blue-500 hover:underline">
-              로그인
-            </a>
-            이 필요합니다.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -88,11 +61,10 @@ export function ReviewForm({ restaurantId, onReviewSubmitted }: ReviewFormProps)
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">별점</label>
-            <StarRating
+            <label className="block text-sm font-medium text-gray-700 mb-2">평점</label>
+            <RatingSelector
               rating={formData.score}
               onRatingChange={(score) => setFormData((prev) => ({ ...prev, score }))}
-              size="lg"
             />
           </div>
 
@@ -120,10 +92,11 @@ export function ReviewForm({ restaurantId, onReviewSubmitted }: ReviewFormProps)
 
           <Button
             type="submit"
-            disabled={isSubmitting || formData.score === 0 || formData.comment.trim().length < 5}
+            disabled={isSubmitting || formData.score === 0 || formData.comment.trim().length === 0}
             className="w-full"
           >
-            {isSubmitting ? '작성 중...' : '리뷰 작성'}
+            {isSubmitting && <Loader2 className="animate-spin" />}
+            리뷰 작성
           </Button>
         </form>
       </CardContent>
