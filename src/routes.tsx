@@ -4,8 +4,8 @@ import Home from '@/pages/Home';
 import NotFound from '@/pages/NotFound';
 import RestaurantDetail from '@/pages/RestaurantDetail';
 import VisitRanking from '@/pages/VisitRanking';
-import Login from '@/pages/Login';
 import AuthCallback from '@/pages/AuthCallback';
+import MyPage from '@/pages/MyPage';
 
 export default function AppRoutes() {
   return (
@@ -14,8 +14,8 @@ export default function AppRoutes() {
         <Route index element={<Home />} />
         <Route path="restaurant/:id" element={<RestaurantDetail />} />
         <Route path="ranking" element={<VisitRanking />} />
+        <Route path="mypage" element={<MyPage />} />
 
-        <Route path="login" element={<Login />} />
         <Route path="auth/google" element={<AuthCallback />} />
 
         <Route path="*" element={<NotFound />} />
