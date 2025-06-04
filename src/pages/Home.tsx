@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useDebounce } from '@/hooks/useDebounce';
-import type { Restaurant, RestaurantsResponse } from '@/types/restaurant';
+import { FOOD_CATEGORIES } from '@/types/restaurant';
+import type { Restaurant, RestaurantsResponse, FoodCategory } from '@/types/restaurant';
 
 const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
 
@@ -20,6 +21,7 @@ interface MapBounds {
 export default function Home() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [hoveredRestaurant, setHoveredRestaurant] = useState<Restaurant | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<FoodCategory | null>(null);
   const [mapBounds, setMapBounds] = useState<MapBounds>({
     ne_lat: 37.280320141059896,
     ne_lng: 127.04707734473452,
@@ -37,6 +39,10 @@ export default function Home() {
       sw_lng: debouncedMapBounds.sw_lng.toString(),
     });
 
+    if (selectedCategory) {
+      params.append('category', selectedCategory);
+    }
+
     fetch(`/api/restaurants?${params}`)
       .then((response) => {
         if (!response.ok) {
@@ -50,7 +56,7 @@ export default function Home() {
       .catch((error) => {
         console.error('Failed to fetch restaurants by bounds:', error);
       });
-  }, [debouncedMapBounds]);
+  }, [debouncedMapBounds, selectedCategory]);
 
   return (
     <>
@@ -61,6 +67,25 @@ export default function Home() {
             <Search />
           </Button>
         </div>
+
+        <div className="px-3 pb-2">
+          <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
+            {FOOD_CATEGORIES.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? 'default' : 'outline'}
+                size="sm"
+                className={`whitespace-nowrap ${
+                  selectedCategory === category ? 'bg-primary text-primary-foreground' : 'hover:bg-secondary'
+                }`}
+                onClick={() => setSelectedCategory((prev) => (prev === category ? null : category))}
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         <Map
           center={{ lat: 37.278431, lng: 127.043809 }}
           className="flex flex-col flex-grow items-center justify-center bg-gray-100"

@@ -29,3 +29,20 @@ export interface RestaurantsResponse {
   items_per_page: number;
   restaurants: Restaurant[];
 }
+
+export const FOOD_CATEGORIES = [
+  '한식',
+  '중식',
+  '양식',
+  '일식',
+  '아시아',
+  '패스트푸드',
+  '분식',
+  '카페',
+  '치킨',
+  '술집',
+  '간식',
+  '뷔페',
+] as const;
+
+export type FoodCategory = (typeof FOOD_CATEGORIES)[number];
