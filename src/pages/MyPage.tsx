@@ -4,7 +4,7 @@ import { User, MessageSquare, LogOut, Calendar, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { StarRating } from '@/components/ui/star-rating';
+import { RatingDisplay } from '@/components/ui/rating-display';
 import { GoogleLoginButton } from '@/components/GoogleLoginButton';
 import { useAuth } from '@/contexts/AuthContext';
 import type { MyReviewsResponse, MyReview } from '@/types/review';
@@ -152,16 +152,6 @@ export default function MyPage() {
                   const restaurant = restaurantCache[review.restaurant_id];
                   return (
                     <div key={review.review_id} className="border-b border-gray-100 last:border-b-0 pb-6 last:pb-0">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <StarRating rating={review.score} readonly size="sm" />
-                          <div className="flex items-center text-xs text-gray-500">
-                            <Calendar className="w-3 h-3 mr-1" />
-                            {formatDate(review.created_at)}
-                          </div>
-                        </div>
-                      </div>
-
                       {restaurant && (
                         <div className="mb-3">
                           <Link to={`/restaurant/${review.restaurant_id}`}>
@@ -175,6 +165,16 @@ export default function MyPage() {
                           </Link>
                         </div>
                       )}
+
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <RatingDisplay rating={review.score} size="sm" />
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Calendar className="w-3 h-3 mr-1" />
+                            {formatDate(review.created_at)}
+                          </div>
+                        </div>
+                      </div>
 
                       <p className="text-gray-700 leading-relaxed mb-3">{review.comment}</p>
                     </div>

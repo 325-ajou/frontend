@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { StarRating } from '@/components/ui/star-rating';
+import { RatingDisplay } from '@/components/ui/rating-display';
 import { Button } from '@/components/ui/button';
 import type { Review, ReviewResponse } from '@/types/review';
 import { MessageSquare } from 'lucide-react';
@@ -122,7 +122,7 @@ export function ReviewList({ restaurantId, refreshTrigger, oneLineComment }: Rev
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
                   <span className="font-medium text-gray-900">{review.reviewer}</span>
-                  <StarRating rating={review.score} readonly size="sm" />
+                  <RatingDisplay rating={review.score} size="sm" />
                 </div>
                 <span className="text-xs text-gray-500">{formatDate(review.created_at)}</span>
               </div>
