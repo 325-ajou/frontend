@@ -45,4 +45,20 @@ export const FOOD_CATEGORIES = [
   '뷔페',
 ] as const;
 
+export interface RestaurantRecommendation extends Restaurant {
+  monthly_visits: number;
+  weekly_visits: number;
+  daily_visits: number;
+  recommendation_reason: string;
+}
+
+export interface AIRecommendationRequest {
+  situation: string;
+  category?: string;
+}
+
+export interface AIRecommendationResponse {
+  recommendations: RestaurantRecommendation[];
+}
+
 export type FoodCategory = (typeof FOOD_CATEGORIES)[number];
