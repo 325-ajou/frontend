@@ -106,7 +106,7 @@ export default function MyPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold">{isLoggedIn && user ? user.user_name : `익명의 아주대생`}</h3>
+                <h3 className="text-lg font-semibold">{user ? user.user_name : `익명의 아주대생`}</h3>
                 {isLoggedIn && user && <p className="text-gray-600">@{user.user_login_id}</p>}
               </div>
               {isLoggedIn && (
@@ -116,15 +116,6 @@ export default function MyPage() {
                 </Button>
               )}
             </div>
-
-            {isLoggedIn && (
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <MessageSquare className="w-4 h-4 mr-1" />
-                  <span>리뷰 {totalCount}개</span>
-                </div>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
