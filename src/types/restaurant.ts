@@ -62,3 +62,16 @@ export interface AIRecommendationResponse {
 }
 
 export type FoodCategory = (typeof FOOD_CATEGORIES)[number];
+
+export type RankingPeriod = 'daily' | 'weekly' | 'monthly';
+
+export interface RankingRestaurant extends Restaurant {
+  period_visit_count: number;
+}
+
+export interface VisitRankingResponse {
+  period: RankingPeriod;
+  category?: string;
+  start_time: string;
+  restaurants: RankingRestaurant[];
+}

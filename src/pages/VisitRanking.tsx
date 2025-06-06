@@ -1,89 +1,63 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
+import { Calendar, Clock, Users, MapPin, Trophy, Utensils, CalendarDays } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { RatingDisplay } from '@/components/ui/rating-display';
+import { FOOD_CATEGORIES } from '@/types/restaurant';
+import type { RankingRestaurant, VisitRankingResponse, RankingPeriod, FoodCategory } from '@/types/restaurant';
 
-interface Restaurant {
-  restaurant_id: number;
-  name: string;
-  address: string;
-  phone: string;
-  category: string;
-  lat: string;
-  lng: string;
-  local_currency: boolean;
-  goodness: boolean;
-  kind_price: boolean;
-  review_count: number;
-  visit_count: number;
-  restaurant_score: number;
-}
-
-interface ApiResponse {
-  total_count: number;
-  total_pages: number;
-  current_page: number;
-  items_per_page: number;
-  restaurants: Restaurant[];
-}
+const PERIOD_OPTIONS = [
+  { value: 'daily' as RankingPeriod, label: '일별', icon: Clock },
+  { value: 'weekly' as RankingPeriod, label: '주별', icon: CalendarDays },
+  { value: 'monthly' as RankingPeriod, label: '월별', icon: Calendar },
+];
 
 export default function VisitRanking() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [restaurants, setRestaurants] = useState<RankingRestaurant[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const observer = useRef<IntersectionObserver | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<RankingPeriod>('daily');
+  const [selectedCategory, setSelectedCategory] = useState<FoodCategory | 'Random'>('Random');
 
-  const lastRestaurantElementRef = useCallback(
-    (node: HTMLLIElement | null) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setCurrentPage((prevPage) => prevPage + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore]
-  );
-
-  const fetchRankings = useCallback(async (pageToFetch: number) => {
+  const fetchRankings = async (period: RankingPeriod, category?: FoodCategory | 'Random') => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/restaurants?page=${pageToFetch}`);
+      const params = new URLSearchParams({ period });
+      if (category && category !== 'Random') {
+        params.append('category', category);
+      }
+
+      const response = await fetch(`/api/restaurants/rankings/visits?${params.toString()}`);
       if (!response.ok) {
         throw new Error(`${response.status} Error`);
       }
-      const data: ApiResponse = await response.json();
-
-      setRestaurants((prevRestaurants) => {
-        const newRestaurants = data.restaurants.filter(
-          (newRest) => !prevRestaurants.some((prevRest) => prevRest.restaurant_id === newRest.restaurant_id)
-        );
-        return pageToFetch === 1 ? data.restaurants : [...prevRestaurants, ...newRestaurants];
-      });
-
-      setHasMore(data.current_page < data.total_pages);
+      const data: VisitRankingResponse = await response.json();
+      setRestaurants(data.restaurants);
     } catch (e) {
       if (e instanceof Error) {
         setError(e.message);
       } else {
-        setError("데이터를 불러오는 중 알 수 없는 오류가 발생했습니다.");
+        setError('데이터를 불러오는 중 알 수 없는 오류가 발생했습니다.');
       }
-      setHasMore(false);
+      setRestaurants([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    if (hasMore || currentPage === 1) {
-      fetchRankings(currentPage);
-    }
-  }, [currentPage, fetchRankings, hasMore]);
+    fetchRankings(selectedPeriod, selectedCategory === 'Random' ? undefined : selectedCategory);
+  }, [selectedPeriod, selectedCategory]);
 
-  if (restaurants.length === 0 && loading) {
+  const getPeriodLabel = () => {
+    const option = PERIOD_OPTIONS.find((opt) => opt.value === selectedPeriod);
+    return option?.label || '일별';
+  };
+
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <p className="text-md text-muted-foreground">랭킹 정보를 불러오는 중...</p>
@@ -91,14 +65,14 @@ export default function VisitRanking() {
     );
   }
 
-  if (error && restaurants.length === 0) {
+  if (error) {
     return (
       <div className="flex flex-col justify-center items-center h-screen p-4">
         <p className="text-lg text-red-500">오류가 발생했습니다 - {error}</p>
         <Button
           onClick={() => {
-            setCurrentPage(1);
             setError(null);
+            fetchRankings(selectedPeriod, selectedCategory === 'Random' ? undefined : selectedCategory);
           }}
           variant="secondary"
           className="mt-2"
@@ -110,64 +84,133 @@ export default function VisitRanking() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <header className="mb-6 pt-4">
-        <h1 className="text-3xl font-bold text-center text-gray-800">방문 랭킹</h1>
+    <div className="container mx-auto p-4 max-w-4xl">
+      <header className="mb-8 pt-4">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">🏆 방문 랭킹</h1>
+          <p className="text-gray-600">{getPeriodLabel()} 인기 맛집을 확인해보세요</p>
+        </div>
       </header>
-      {restaurants.length === 0 && !loading && !error ? (
+
+      <div className="mb-6">
+        <div className="flex justify-center gap-2">
+          {PERIOD_OPTIONS.map((option) => {
+            const IconComponent = option.icon;
+            return (
+              <Button
+                key={option.value}
+                variant={selectedPeriod === option.value ? 'default' : 'outline'}
+                onClick={() => setSelectedPeriod(option.value)}
+                className="flex items-center gap-2"
+              >
+                <IconComponent className="w-4 h-4" />
+                {option.label}
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <Button
+            variant={selectedCategory === 'Random' ? 'default' : 'outline'}
+            onClick={() => setSelectedCategory('Random')}
+            className="flex-shrink-0"
+          >
+            전체
+          </Button>
+          {FOOD_CATEGORIES.map((category) => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory(category)}
+              className="flex-shrink-0"
+            >
+              {category}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {restaurants.length === 0 ? (
         <div className="text-center text-gray-500 mt-10">
-          <p>랭킹 정보가 없습니다.</p>
+          <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <p className="text-lg">랭킹 정보가 없습니다.</p>
+          <p className="text-sm text-gray-400 mt-1">다른 기간이나 카테고리를 선택해보세요.</p>
         </div>
       ) : (
-        <ul className="space-y-4">
+        <div className="space-y-4">
           {restaurants.map((restaurant, index) => (
-            <li
-              ref={restaurants.length === index + 1 ? lastRestaurantElementRef : null}
-              key={restaurant.restaurant_id}
-              className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-            >
-              <div className="flex flex-col sm:flex-row justify-between sm:items-center">
-                <div className="mb-2 sm:mb-0">
-                  <h2 className="text-xl font-semibold text-primary">
-                    <span className="text-gray-500 mr-2">{index + 1}위</span>
-                    {restaurant.name}
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">{restaurant.address}</p>
-                  <p className="text-xs text-gray-500 mt-1">{restaurant.category}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-medium text-blue-600">
-                    {restaurant.visit_count.toLocaleString()}회 방문
-                  </span>
-                </div>
-              </div>
-            </li>
+            <Link className="block" key={restaurant.restaurant_id} to={`/restaurant/${restaurant.restaurant_id}`}>
+              <Card className="hover:shadow-md transition-shadow duration-200">
+                <CardContent>
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                          <Badge
+                            variant={index < 3 ? 'default' : 'secondary'}
+                            className={`text-lg px-3 py-1 font-bold ${
+                              index === 0
+                                ? 'bg-yellow-500 text-white'
+                                : index === 1
+                                ? 'bg-gray-400 text-white'
+                                : index === 2
+                                ? 'bg-orange-900 text-white'
+                                : ''
+                            }`}
+                          >
+                            {index + 1}위
+                          </Badge>
+                        </div>
+
+                        <div className="flex flex-col gap-1 min-w-0 flex-1">
+                          <h2 className="text-xl font-bold text-gray-800 mb-1 truncate">{restaurant.name}</h2>
+                          <div className="flex items-center gap-2 text-xs text-gray-600">
+                            <Utensils className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{restaurant.category}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2 text-xs text-gray-600">
+                            <MapPin className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{restaurant.address}</span>
+                          </div>
+
+                          <div className="flex items-center mt-2">
+                            <div className="flex items-center gap-2">
+                              {restaurant.avg_score > 0 && (
+                                <>
+                                  <RatingDisplay rating={Math.round(restaurant.avg_score)} size="sm" />
+                                  <span className="text-sm text-gray-600">{restaurant.avg_score.toFixed(1)}</span>
+                                </>
+                              )}
+                            </div>
+
+                            <div className="text-xs text-gray-500">
+                              <span>
+                                누적 방문 {restaurant.visit_count.toLocaleString()}회 • 리뷰 {restaurant.review_count}개
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0 text-center">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-5 h-5 text-blue-600" />
+                        <span className="text-2xl font-bold text-blue-600">
+                          {restaurant.period_visit_count.toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500">{getPeriodLabel()} 방문</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
-        </ul>
-      )}
-      {loading && restaurants.length > 0 && (
-        <div className="flex justify-center items-center py-8">
-          <p className="text-sm text-muted-foreground">더 많은 맛집을 불러오는 중...</p>
-        </div>
-      )}
-      {!error && !loading && !hasMore && restaurants.length > 0 && (
-        <div className="text-center text-gray-500 py-8">
-          <p>모든 맛집 정보를 불러왔습니다.</p>
-        </div>
-      )}
-      {error && restaurants.length > 0 && (
-        <div className="text-center text-red-500 py-8">
-          <p>추가 데이터를 불러오는 중 오류가 발생했습니다 - {error}</p>
-          <Button
-            onClick={() => {
-              setError(null);
-              setHasMore(true);
-            }}
-            variant="secondary"
-            className="mt-2"
-          >
-            재시도
-          </Button>
         </div>
       )}
     </div>
