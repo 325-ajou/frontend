@@ -177,15 +177,10 @@ export default function VisitRanking() {
                             <span className="truncate">{restaurant.address}</span>
                           </div>
 
-                          <div className="flex items-center mt-2">
-                            <div className="flex items-center gap-2">
-                              {restaurant.avg_score > 0 && (
-                                <>
-                                  <RatingDisplay rating={Math.round(restaurant.avg_score)} size="sm" />
-                                  <span className="text-sm text-gray-600">{restaurant.avg_score.toFixed(1)}</span>
-                                </>
-                              )}
-                            </div>
+                          <div className="flex items-center mt-2 gap-2">
+                            {restaurant.avg_score > 0 && (
+                              <RatingDisplay rating={Math.round(restaurant.avg_score)} size="sm" />
+                            )}
 
                             <div className="text-xs text-gray-500">
                               <span>

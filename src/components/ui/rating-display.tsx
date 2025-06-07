@@ -50,7 +50,7 @@ export function RatingDisplay({ rating, size = 'md', showLabel = true, className
   return (
     <div
       className={cn(
-        'inline-flex items-baseline rounded-full bg-gray-50 border border-gray-200',
+        'inline-flex items-baseline rounded-full bg-gray-50 border border-gray-200 whitespace-nowrap',
         sizeClasses[size].container,
         className
       )}
