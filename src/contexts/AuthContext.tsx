@@ -73,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Logout failed:', error);
     } finally {
       clearUserData();
+      window.location.reload();
     }
   }, [clearUserData]);
 

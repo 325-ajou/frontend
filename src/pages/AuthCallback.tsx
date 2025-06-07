@@ -32,7 +32,7 @@ export default function AuthCallback() {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ auth_code }),
+          body: JSON.stringify({ auth_code, redirect_uri: `${window.location.origin}/auth/google` }),
           credentials: 'include',
         });
 
