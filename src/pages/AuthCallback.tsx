@@ -33,6 +33,7 @@ export default function AuthCallback() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ auth_code }),
+          credentials: 'include',
         });
 
         if (!response.ok) {

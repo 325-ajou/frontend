@@ -27,7 +27,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchCurrentUser = useCallback(async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch user data');
       }
@@ -66,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, { method: 'POST' });
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {

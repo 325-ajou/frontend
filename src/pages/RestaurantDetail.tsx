@@ -25,7 +25,9 @@ export default function RestaurantDetail() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${id}`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${id}`, {
+      credentials: 'include',
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`데이터를 불러오는 데 실패했습니다: ${response.status}`);
@@ -54,6 +56,7 @@ export default function RestaurantDetail() {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
         }
       );
 
@@ -85,7 +88,9 @@ export default function RestaurantDetail() {
   const handleReviewSubmitted = () => {
     setReviewRefreshTrigger((prev) => prev + 1);
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${id}`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${id}`, {
+      credentials: 'include',
+    })
       .then((response) => response.json())
       .then((data: RestaurantDetail) => {
         setRestaurant(data);

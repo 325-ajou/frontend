@@ -54,6 +54,7 @@ export default function Recommend() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
+        credentials: 'include',
       });
 
       if (!response.ok) {
