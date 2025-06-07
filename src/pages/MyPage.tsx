@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import { User, MessageSquare, LogOut, Calendar, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,53 +18,50 @@ export default function MyPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [restaurantCache, setRestaurantCache] = useState<Record<number, Restaurant>>({});
+  const restaurantCache = useRef<Record<number, Restaurant>>({});
 
-  const fetchRestaurantInfo = useCallback(
-    async (restaurantId: number) => {
-      if (restaurantCache[restaurantId]) return restaurantCache[restaurantId];
+  const fetchRestaurantInfo = async (restaurantId: number) => {
+    if (restaurantCache.current[restaurantId]) return restaurantCache.current[restaurantId];
 
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${restaurantId}`, {
-          credentials: 'include',
-        });
-        if (response.ok) {
-          const restaurant: Restaurant = await response.json();
-          setRestaurantCache((prev) => ({ ...prev, [restaurantId]: restaurant }));
-          return restaurant;
-        }
-      } catch (error) {
-        console.error(`Failed to fetch restaurant ${restaurantId}:`, error);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${restaurantId}`, {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const restaurant: Restaurant = await response.json();
+        restaurantCache.current[restaurantId] = restaurant;
+        return restaurant;
       }
-      return null;
-    },
-    [restaurantCache]
-  );
+    } catch (error) {
+      console.error(`Failed to fetch restaurant ${restaurantId}:`, error);
+    }
+    return null;
+  };
 
   useEffect(() => {
     if (!isLoggedIn) return;
 
     const fetchMyReviews = async () => {
+      setReviewsLoading(true);
+      setReviewsError(null);
       try {
-        setReviewsLoading(true);
-        setReviewsError(null);
-
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me/reviews?page=${currentPage}`, {
           credentials: 'include',
         });
-
         if (!response.ok) {
           throw new Error(`리뷰를 불러오는 데 실패했습니다: ${response.status}`);
         }
-
         const data: MyReviewsResponse = await response.json();
         setReviews(data.reviews);
         setTotalPages(data.total_pages);
         setTotalCount(data.total_count);
 
-        data.reviews.forEach((review) => {
-          fetchRestaurantInfo(review.restaurant_id);
-        });
+        const missingRestaurantIds = data.reviews
+          .map((review) => review.restaurant_id)
+          .filter((id) => !restaurantCache.current[id]);
+        if (missingRestaurantIds.length > 0) {
+          await Promise.all(missingRestaurantIds.map((id) => fetchRestaurantInfo(id)));
+        }
       } catch (err) {
         setReviewsError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
@@ -73,7 +70,7 @@ export default function MyPage() {
     };
 
     fetchMyReviews();
-  }, [isLoggedIn, currentPage, fetchRestaurantInfo]);
+  }, [isLoggedIn, currentPage]);
 
   const handleLogout = async () => {
     try {
@@ -154,7 +151,7 @@ export default function MyPage() {
             ) : (
               <div className="space-y-6">
                 {reviews.map((review) => {
-                  const restaurant = restaurantCache[review.restaurant_id];
+                  const restaurant = restaurantCache.current[review.restaurant_id];
                   return (
                     <div key={review.review_id} className="border-b border-gray-100 last:border-b-0 pb-6 last:pb-0">
                       {restaurant && (
