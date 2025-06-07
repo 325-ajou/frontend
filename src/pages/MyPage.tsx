@@ -25,7 +25,7 @@ export default function MyPage() {
       if (restaurantCache[restaurantId]) return restaurantCache[restaurantId];
 
       try {
-        const response = await fetch(`/api/restaurants/${restaurantId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${restaurantId}`);
         if (response.ok) {
           const restaurant: Restaurant = await response.json();
           setRestaurantCache((prev) => ({ ...prev, [restaurantId]: restaurant }));
@@ -47,7 +47,7 @@ export default function MyPage() {
         setReviewsLoading(true);
         setReviewsError(null);
 
-        const response = await fetch(`/api/users/me/reviews?page=${currentPage}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users/me/reviews?page=${currentPage}`);
 
         if (!response.ok) {
           throw new Error(`리뷰를 불러오는 데 실패했습니다: ${response.status}`);

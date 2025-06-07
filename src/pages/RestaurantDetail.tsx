@@ -25,7 +25,7 @@ export default function RestaurantDetail() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`/api/restaurants/${id}`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${id}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`데이터를 불러오는 데 실패했습니다: ${response.status}`);
@@ -47,12 +47,15 @@ export default function RestaurantDetail() {
     setIsVisiting(true);
 
     try {
-      const response = await fetch(`/api/restaurants/${restaurant.restaurant_id}/visit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/restaurants/${restaurant.restaurant_id}/visit`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (!response.ok) {
         if (response.status === 400) {
@@ -82,7 +85,7 @@ export default function RestaurantDetail() {
   const handleReviewSubmitted = () => {
     setReviewRefreshTrigger((prev) => prev + 1);
 
-    fetch(`/api/restaurants/${id}`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${id}`)
       .then((response) => response.json())
       .then((data: RestaurantDetail) => {
         setRestaurant(data);

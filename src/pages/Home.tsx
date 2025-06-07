@@ -43,7 +43,7 @@ export default function Home() {
       params.append('category', selectedCategory);
     }
 
-    fetch(`/api/restaurants?${params}`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants?${params}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`${response.status} Error`);

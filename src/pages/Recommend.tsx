@@ -48,7 +48,7 @@ export default function Recommend() {
         ...(selectedCategory !== '랜덤' && { category: selectedCategory }),
       };
 
-      const response = await fetch('/api/restaurants/recommend', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/recommend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

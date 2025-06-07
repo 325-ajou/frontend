@@ -31,7 +31,7 @@ export function ReviewForm({ restaurantId, onReviewSubmitted }: ReviewFormProps)
     setError(null);
 
     try {
-      const response = await fetch(`/api/restaurants/${restaurantId}/reviews`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${restaurantId}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

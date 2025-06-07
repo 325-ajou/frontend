@@ -21,7 +21,7 @@ export function ReviewList({ restaurantId, refreshTrigger, oneLineComment }: Rev
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/restaurants/${restaurantId}/reviews`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${restaurantId}/reviews`);
 
       if (!response.ok) {
         throw new Error(`리뷰를 불러오는 데 실패했습니다: ${response.status}`);

@@ -30,7 +30,9 @@ export default function VisitRanking() {
         params.append('category', category);
       }
 
-      const response = await fetch(`/api/restaurants/rankings/visits?${params.toString()}`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/restaurants/rankings/visits?${params.toString()}`
+      );
       if (!response.ok) {
         throw new Error(`${response.status} Error`);
       }
@@ -192,7 +194,7 @@ export default function VisitRanking() {
                       </div>
                     </div>
 
-                    <div className="flex-shrink-0 text-center">
+                    <div className="flex flex-col items-center">
                       <div className="flex items-center gap-2">
                         <Users className="w-5 h-5 text-blue-600" />
                         <span className="text-2xl font-bold text-blue-600">

@@ -29,7 +29,7 @@ export default function AuthCallback() {
 
     const requestSession = async (auth_code: string) => {
       try {
-        const response = await fetch(`/api/auth/google`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ auth_code }),
