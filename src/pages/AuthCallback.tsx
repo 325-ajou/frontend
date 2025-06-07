@@ -14,13 +14,13 @@ export default function AuthCallback() {
 
     if (error) {
       console.error('OAuth error:', error);
-      navigate('/login');
+      navigate('/mypage');
       return;
     }
 
     if (!code) {
       console.error('Missing authorization code');
-      navigate('/login');
+      navigate('/mypage');
       return;
     }
 
@@ -38,7 +38,7 @@ export default function AuthCallback() {
 
         if (!response.ok) {
           console.error('Backend login failed', response);
-          navigate('/login');
+          navigate('/mypage');
           return;
         }
 
@@ -48,7 +48,7 @@ export default function AuthCallback() {
         navigate('/');
       } catch (error) {
         console.error('Authentication error:', error);
-        navigate('/login');
+        navigate('/mypage');
       }
     };
 
