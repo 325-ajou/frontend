@@ -185,6 +185,8 @@ export default function Home() {
                 className="text-lg rounded-2xl cursor-pointer"
                 onMouseOver={() => setHoveredRestaurant(restaurant)}
                 onMouseOut={() => setHoveredRestaurant(null)}
+                onMouseEnter={() => setHoveredRestaurant(restaurant)}
+                onMouseLeave={() => setHoveredRestaurant(null)}
                 onClick={() => handleRestaurantClick(restaurant.restaurant_id)}
               >
                 {review[Math.round(restaurant.avg_score)]}
@@ -215,7 +217,12 @@ export default function Home() {
               }}
               yAnchor={1}
             >
-              <div className="p-3 bg-white rounded-md shadow-lg border border-gray-200 text-xs w-60">
+              <div
+                className="p-3 bg-white rounded-md shadow-lg border border-gray-200 text-xs w-60 cursor-pointer"
+                onMouseEnter={() => setHoveredRestaurant(hoveredRestaurant)}
+                onMouseLeave={() => setHoveredRestaurant(null)}
+                onClick={() => handleRestaurantClick(hoveredRestaurant.restaurant_id)}
+              >
                 <h4 className="font-bold text-sm mb-1">{hoveredRestaurant.name}</h4>
                 <p className="text-gray-700 mb-0.5 overflow-hidden text-ellipsis whitespace-nowrap">
                   <strong>카테고리:</strong> {hoveredRestaurant.category}
