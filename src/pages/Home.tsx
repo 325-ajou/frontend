@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useDebounce } from '@/hooks/useDebounce';
 import { FOOD_CATEGORIES } from '@/types/restaurant';
 import type { Restaurant, RestaurantsResponse, FoodCategory } from '@/types/restaurant';
+import logo from '@/assets/logo.png';
 
 const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
 
@@ -116,7 +117,12 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col h-full">
-        <div className="flex w-full items-center space-x-2 px-3 py-2">
+        <div className="w-full flex justify-center items-center">
+          <Link to="/">
+            <img src={logo} alt="아주한끼 로고" className="h-14" />
+          </Link>
+        </div>
+        <div className="flex w-full items-center space-x-2 px-3 pb-2">
           <Input type="text" placeholder="검색..." className="w-full" />
           <Button type="submit" variant="secondary">
             <Search />
@@ -148,7 +154,6 @@ export default function Home() {
             mapRef.current = map;
           }}
           onBoundsChanged={(map) => {
-            console.log('map changed');
             const bounds = map.getBounds();
             const sw = bounds.getSouthWest();
             const ne = bounds.getNorthEast();
@@ -179,7 +184,6 @@ export default function Home() {
             </CustomOverlayMap>
           ))}
 
-          {/* 사용자 위치 마커 */}
           {userLocation && (
             <MapMarker
               position={userLocation}
