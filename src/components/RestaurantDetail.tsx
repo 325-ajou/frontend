@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import { Phone, MapPin, Utensils, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -14,8 +13,7 @@ import type { RestaurantDetail } from '@/types/restaurant';
 
 const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
 
-export default function RestaurantDetail() {
-  const { id } = useParams<{ id: string }>();
+export default function RestaurantDetail({ restaurantId }: { restaurantId: string }) {
   const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,9 +21,9 @@ export default function RestaurantDetail() {
   const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0);
 
   useEffect(() => {
-    if (!id) return;
+    if (!restaurantId) return;
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${id}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${restaurantId}`, {
       credentials: 'include',
     })
       .then((response) => {
@@ -42,7 +40,7 @@ export default function RestaurantDetail() {
         setError(err.message);
         setLoading(false);
       });
-  }, [id]);
+  }, [restaurantId]);
 
   const handleVisit = async () => {
     if (!restaurant) return;
@@ -88,7 +86,7 @@ export default function RestaurantDetail() {
   const handleReviewSubmitted = () => {
     setReviewRefreshTrigger((prev) => prev + 1);
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${id}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants/${restaurantId}`, {
       credentials: 'include',
     })
       .then((response) => response.json())
