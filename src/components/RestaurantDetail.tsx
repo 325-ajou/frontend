@@ -125,7 +125,7 @@ export default function RestaurantDetail({ restaurantId }: { restaurantId: strin
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-4xl">
+    <div className="container mx-auto p-4 md:p-8 max-w-4xl overflow-y-auto">
       <Card className="mb-6 shadow-lg">
         <CardHeader>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">

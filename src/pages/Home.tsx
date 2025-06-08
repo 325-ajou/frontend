@@ -6,9 +6,11 @@ import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useDebounce } from '@/hooks/useDebounce';
 import { FOOD_CATEGORIES } from '@/types/restaurant';
 import type { Restaurant, RestaurantsResponse, FoodCategory } from '@/types/restaurant';
+import RestaurantDetail from '@/components/RestaurantDetail';
 import logo from '@/assets/logo.png';
 
 const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
@@ -33,9 +35,16 @@ export default function Home() {
   const [mapCenter, setMapCenter] = useState({ lat: 37.278431, lng: 127.043809 });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null);
 
   const debouncedMapBounds = useDebounce(mapBounds, 500);
+
+  const handleRestaurantClick = (restaurantId: number) => {
+    setSelectedRestaurantId(restaurantId.toString());
+    setIsDrawerOpen(true);
+  };
 
   const handleGetCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -171,16 +180,15 @@ export default function Home() {
               key={restaurant.restaurant_id}
               position={{ lat: parseFloat(restaurant.lat), lng: parseFloat(restaurant.lng) }}
             >
-              <Link to={`/restaurant/${restaurant.restaurant_id}`}>
-                <Badge
-                  variant="default"
-                  className="text-lg rounded-2xl"
-                  onMouseOver={() => setHoveredRestaurant(restaurant)}
-                  onMouseOut={() => setHoveredRestaurant(null)}
-                >
-                  {review[Math.round(restaurant.avg_score)]}
-                </Badge>
-              </Link>
+              <Badge
+                variant="default"
+                className="text-lg rounded-2xl cursor-pointer"
+                onMouseOver={() => setHoveredRestaurant(restaurant)}
+                onMouseOut={() => setHoveredRestaurant(null)}
+                onClick={() => handleRestaurantClick(restaurant.restaurant_id)}
+              >
+                {review[Math.round(restaurant.avg_score)]}
+              </Badge>
             </CustomOverlayMap>
           ))}
 
@@ -233,6 +241,12 @@ export default function Home() {
           {isGettingLocation ? <Loader2 className="size-5 animate-spin" /> : <Locate className="size-6" />}
         </Button>
       </div>
+
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerContent>
+          {selectedRestaurantId && <RestaurantDetail restaurantId={selectedRestaurantId} />}
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }
