@@ -6,12 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { RatingDisplay } from '@/components/ui/rating-display';
 import { ReviewForm } from '@/components/ReviewForm';
 import { ReviewList } from '@/components/ReviewList';
 import { MenuList } from '@/components/MenuList';
 import type { RestaurantDetail } from '@/types/restaurant';
-
-const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
 
 export default function RestaurantDetail({ restaurantId }: { restaurantId: string }) {
   const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
@@ -133,12 +132,7 @@ export default function RestaurantDetail({ restaurantId }: { restaurantId: strin
               <CardTitle className="text-3xl md:text-4xl font-bold text-gray-800">{restaurant.name}</CardTitle>
               <CardDescription className="text-lg text-gray-600 mt-1">{restaurant.category}</CardDescription>
             </div>
-            <div className="mt-2 md:mt-0 flex flex-col items-end space-y-1">
-              <Badge variant="outline" className="text-2xl p-2 px-4 font-bold">
-                {review[Math.round(restaurant.avg_score)]}{' '}
-                <span className="ml-2 text-yellow-500">{restaurant.avg_score}</span>
-              </Badge>
-            </div>
+            <RatingDisplay size="lg" rating={Math.round(restaurant.avg_score)} className="mt-3 md:mt-0" />
           </div>
         </CardHeader>
         <CardContent>

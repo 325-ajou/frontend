@@ -8,9 +8,8 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { AIRecommendationRequest, RestaurantRecommendation, FoodCategory } from '@/types/restaurant';
+import { RATING_OPTIONS } from '@/types/review';
 import { FOOD_CATEGORIES } from '@/types/restaurant';
-
-const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
 
 const EXAMPLE_SITUATIONS = [
   '친구와 함께 시험 끝나고 맛있는 걸 먹고 싶어요',
@@ -237,7 +236,7 @@ export default function Recommend() {
                     </div>
                     <div className="flex flex-col items-end space-y-2">
                       <Badge variant="outline" className="text-xl p-2 px-4 font-bold">
-                        {review[Math.round(restaurant.avg_score)]}{' '}
+                        {RATING_OPTIONS[Math.round(restaurant.avg_score)].emoji}{' '}
                         <span className="ml-2 text-yellow-500">{restaurant.avg_score}</span>
                       </Badge>
                     </div>

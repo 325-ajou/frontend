@@ -43,7 +43,7 @@ export function RatingDisplay({ rating, size = 'md', showLabel = true, className
     lg: {
       emoji: 'text-lg',
       label: 'text-base',
-      container: 'gap-2 px-3 py-2',
+      container: 'gap-2 px-3 py-2 rounded-md',
     },
   };
 

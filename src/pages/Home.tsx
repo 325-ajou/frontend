@@ -8,12 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useDebounce } from '@/hooks/useDebounce';
+import { RATING_OPTIONS } from '@/types/review';
 import { FOOD_CATEGORIES } from '@/types/restaurant';
 import type { Restaurant, RestaurantsResponse, FoodCategory } from '@/types/restaurant';
 import RestaurantDetail from '@/components/RestaurantDetail';
 import logo from '@/assets/logo.png';
-
-const review = ['❓', '😡', '😐', '👍', '👍👍', '👍👍👍'];
 
 interface MapBounds {
   ne_lat: number;
@@ -189,7 +188,7 @@ export default function Home() {
                 onMouseLeave={() => setHoveredRestaurant(null)}
                 onClick={() => handleRestaurantClick(restaurant.restaurant_id)}
               >
-                {review[Math.round(restaurant.avg_score)]}
+                {RATING_OPTIONS[Math.round(restaurant.avg_score)].emoji}
               </Badge>
             </CustomOverlayMap>
           ))}
