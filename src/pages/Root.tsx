@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router';
-import { Map, ChartLine, Crown, Dices, UserRound } from 'lucide-react';
+import { Map, ChartLine, Crown, UserRound, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -55,7 +55,7 @@ export default function Root() {
             )
           }
         >
-          <Dices className="h-6 w-6" />
+          <Sparkles className="h-6 w-6" />
           메뉴 추천
         </NavLink>
         <NavLink

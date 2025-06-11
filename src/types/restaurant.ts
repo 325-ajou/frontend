@@ -52,12 +52,12 @@ export interface RestaurantRecommendation extends Restaurant {
   recommendation_reason: string;
 }
 
-export interface AIRecommendationRequest {
+export interface RecommendationRequest {
   situation: string;
   category?: string;
 }
 
-export interface AIRecommendationResponse {
+export interface RecommendationResponse {
   recommendations: RestaurantRecommendation[];
 }
 

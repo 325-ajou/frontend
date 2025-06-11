@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { Dices, Sparkles, MapPin, Phone, Utensils, Star, TrendingUp, Users, Loader2 } from 'lucide-react';
+import { Sparkles, MapPin, Phone, Utensils, Star, TrendingUp, Users, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import type { AIRecommendationRequest, RestaurantRecommendation, FoodCategory } from '@/types/restaurant';
+import type { RecommendationRequest, RestaurantRecommendation, FoodCategory } from '@/types/restaurant';
 import { RATING_OPTIONS } from '@/types/review';
 import { FOOD_CATEGORIES } from '@/types/restaurant';
 
@@ -42,7 +42,7 @@ export default function Recommend() {
     setHasSearched(true);
 
     try {
-      const requestBody: AIRecommendationRequest = {
+      const requestBody: RecommendationRequest = {
         situation: situation.trim(),
         ...(selectedCategory !== '랜덤' && { category: selectedCategory }),
       };
@@ -74,26 +74,17 @@ export default function Recommend() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-6xl">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <Dices className="w-8 h-8 text-purple-500" />
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            AI 메뉴 추천
-          </h1>
+    <div className="container mx-auto p-4 max-w-4xl">
+      <header className="mb-8 pt-4">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">🍴 AI 메뉴 추천</h1>
+          <p className="text-gray-600">당신의 상황과 기분에 맞는 완벽한 맛집을 추천해드려요</p>
         </div>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          당신의 상황과 기분을 알려주세요. AI가 완벽한 맛집을 추천해드립니다.
-        </p>
-      </div>
+      </header>
 
       <Card className="mb-8 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold flex items-center gap-2">
-            <Dices className="w-6 h-6 text-purple-500" />
-            어떤 맛집을 추천해드릴까요?
-          </CardTitle>
+          <CardTitle className="text-2xl font-semibold flex items-center gap-2">어떤 맛집을 추천해드릴까요?</CardTitle>
           <CardDescription>
             현재 상황, 기분, 함께하는 사람 등을 자세히 설명해주시면 더 정확한 추천을 받을 수 있어요.
           </CardDescription>
@@ -168,7 +159,7 @@ export default function Recommend() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold text-md"
+              className="w-full bg-gradient-to-r from-[#0066b3] to-[#004080] hover:from-[#004080] hover:to-[#003366] text-white font-semibold text-md"
               disabled={loading}
             >
               {loading ? (
@@ -187,7 +178,6 @@ export default function Recommend() {
         </CardContent>
       </Card>
 
-      {/* No Results Message */}
       {hasSearched && !loading && recommendations.length === 0 && !error && (
         <Card className="mb-8 border-yellow-200 bg-yellow-50">
           <CardContent className="pt-6">
@@ -202,7 +192,6 @@ export default function Recommend() {
         </Card>
       )}
 
-      {/* Recommendations */}
       {recommendations.length > 0 && (
         <div className="space-y-6">
           <div className="text-center">
@@ -217,19 +206,11 @@ export default function Recommend() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <Badge
-                          variant="outline"
-                          className="text-lg px-3 py-1 font-bold bg-gradient-to-r from-purple-100 to-pink-100"
-                        >
+                        <Badge variant="outline" className="text-lg px-3 py-1 font-bold text-white bg-[#0066b3]">
                           #{index + 1}
                         </Badge>
                         <CardTitle className="text-2xl font-bold text-gray-800">
-                          <Link
-                            to={`/restaurant/${restaurant.restaurant_id}`}
-                            className="hover:text-purple-600 transition-colors"
-                          >
-                            {restaurant.name}
-                          </Link>
+                          <Link to={`/restaurant/${restaurant.restaurant_id}`}>{restaurant.name}</Link>
                         </CardTitle>
                       </div>
                       <CardDescription className="text-lg text-gray-600 mb-3">{restaurant.category}</CardDescription>
@@ -243,18 +224,16 @@ export default function Recommend() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* AI Recommendation Reason */}
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100">
+                  <div className="p-4 rounded-lg border border-blue-100 bg-blue-50">
                     <div className="flex items-start gap-2">
-                      <Sparkles className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h4 className="font-semibold text-purple-800 mb-1">AI 추천 이유</h4>
+                        <h4 className="font-semibold text-blue-800 mb-1">AI 추천 이유</h4>
                         <p className="text-gray-700 leading-relaxed">{restaurant.recommendation_reason}</p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Restaurant Info */}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-3">
                       <div className="flex items-center text-gray-700">
@@ -279,25 +258,24 @@ export default function Recommend() {
                           <Star className="w-4 h-4" />
                           리뷰 수
                         </span>
-                        <span className="font-semibold text-blue-600">{restaurant.review_count}개</span>
+                        <span className="font-semibold text-[#0066b3]">{restaurant.review_count}개</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600 flex items-center gap-1">
                           <Users className="w-4 h-4" />총 방문
                         </span>
-                        <span className="font-semibold text-green-600">{restaurant.visit_count}회</span>
+                        <span className="font-semibold text-[#0066b3]">{restaurant.visit_count}회</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600 flex items-center gap-1">
                           <TrendingUp className="w-4 h-4" />
                           이달 방문
                         </span>
-                        <span className="font-semibold text-purple-600">{restaurant.monthly_visits}회</span>
+                        <span className="font-semibold text-[#0066b3]">{restaurant.monthly_visits}회</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Badges */}
                   <div className="flex flex-wrap gap-2">
                     {restaurant.local_currency && <Badge variant="secondary">지역화폐 가능</Badge>}
                     {restaurant.goodness && <Badge variant="secondary">모범음식점</Badge>}
@@ -306,7 +284,6 @@ export default function Recommend() {
 
                   <Separator />
 
-                  {/* Action Button */}
                   <div className="flex justify-end">
                     <Button asChild variant="outline">
                       <Link to={`/restaurant/${restaurant.restaurant_id}`}>자세히 보기</Link>
