@@ -55,6 +55,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchCurrentUser();
   }, [fetchCurrentUser]);
 
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchCurrentUser();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchCurrentUser]);
+
   const login = useCallback(
     async (userData?: User) => {
       if (userData) {
