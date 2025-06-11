@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RatingDisplay } from '@/components/ui/rating-display';
 import { Button } from '@/components/ui/button';
 import type { Review, ReviewResponse } from '@/types/review';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Sparkles } from 'lucide-react';
 
 interface ReviewListProps {
   restaurantId: number;
@@ -109,12 +109,15 @@ export function ReviewList({ restaurantId, refreshTrigger, oneLineComment }: Rev
             <MessageSquare className="w-6 h-6 mr-2 text-indigo-500" />
             리뷰 ({reviews.length})
           </CardTitle>
-          {oneLineComment && (
-            <div className="mt-3 p-3 bg-indigo-50 rounded-md border border-indigo-200">
-              <p className="text-sm font-semibold text-indigo-700">✨ AI 리뷰 요약</p>
-              <p className="text-indigo-600 italic">"{oneLineComment}"</p>
+          <div className="mt-3 p-4 rounded-lg border border-blue-100 bg-blue-50">
+            <div className="flex items-start gap-2">
+              <Sparkles className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-semibold text-blue-800 mb-1">AI 리뷰 요약</h4>
+                <p className="text-gray-700 leading-relaxed">{oneLineComment}</p>
+              </div>
             </div>
-          )}
+          </div>
         </CardHeader>
         <CardContent className="flex flex-col space-y-6">
           {reviews.map((review) => (
