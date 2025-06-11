@@ -11,6 +11,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { RATING_OPTIONS } from '@/types/review';
 import { FOOD_CATEGORIES } from '@/types/restaurant';
 import type { Restaurant, RestaurantsResponse, FoodCategory } from '@/types/restaurant';
+import { SearchResultList } from '@/components/SearchResultList';
 import RestaurantDetail from '@/components/RestaurantDetail';
 import logo from '@/assets/logo.png';
 
@@ -36,6 +37,11 @@ export default function Home() {
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Restaurant[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [isSearchDrawerOpen, setIsSearchDrawerOpen] = useState(false);
   const mapRef = useRef<kakao.maps.Map | null>(null);
 
   const debouncedMapBounds = useDebounce(mapBounds, 500);
@@ -95,6 +101,31 @@ export default function Home() {
     );
   };
 
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setIsSearching(true);
+    setSearchError(null);
+
+    try {
+      const params = new URLSearchParams({ search_query: searchQuery });
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/search/restaurants?${params}`);
+
+      if (!response.ok) throw new Error(`${response.status} Error`);
+      const data: RestaurantsResponse = await response.json();
+
+      setSearchResults(data.restaurants);
+      setIsSearchDrawerOpen(true);
+    } catch {
+      setSearchError('검색 중 오류가 발생했습니다.');
+      setSearchResults([]);
+      setIsSearchDrawerOpen(true);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   useEffect(() => {
     const params = new URLSearchParams({
       ne_lat: debouncedMapBounds.ne_lat.toString(),
@@ -131,10 +162,18 @@ export default function Home() {
           </Link>
         </div>
         <div className="flex w-full items-center space-x-2 px-3 pb-2">
-          <Input type="text" placeholder="검색..." className="w-full" />
-          <Button type="submit" variant="secondary">
-            <Search />
-          </Button>
+          <form onSubmit={handleSearch} className="flex w-full items-center space-x-2">
+            <Input
+              type="text"
+              placeholder="검색..."
+              className="w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button type="submit" variant="secondary" disabled={isSearching}>
+              {isSearching ? <Loader2 className="size-5 animate-spin" /> : <Search />}
+            </Button>
+          </form>
         </div>
 
         <div className="px-3 pb-2">
@@ -251,6 +290,16 @@ export default function Home() {
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent>
           {selectedRestaurantId && <RestaurantDetail restaurantId={selectedRestaurantId} />}
+        </DrawerContent>
+      </Drawer>
+
+      <Drawer open={isSearchDrawerOpen} onOpenChange={setIsSearchDrawerOpen}>
+        <DrawerContent>
+          {searchError ? (
+            <div className="text-red-500 text-center">{searchError}</div>
+          ) : (
+            <SearchResultList restaurants={searchResults} />
+          )}
         </DrawerContent>
       </Drawer>
     </>
