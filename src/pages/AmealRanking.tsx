@@ -1,36 +1,28 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { Calendar, Clock, Users, MapPin, Trophy, Utensils, CalendarDays } from 'lucide-react';
+import { MapPin, Trophy, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { RatingDisplay } from '@/components/ui/rating-display';
 import { FOOD_CATEGORIES } from '@/types/restaurant';
-import type { VisitRankingRestaurant, VisitRankingResponse, RankingPeriod, FoodCategory } from '@/types/restaurant';
+import type { Restaurant, VisitRankingResponse, FoodCategory } from '@/types/restaurant';
 
-const PERIOD_OPTIONS = [
-  { value: 'daily' as RankingPeriod, label: '일별', icon: Clock },
-  { value: 'weekly' as RankingPeriod, label: '주별', icon: CalendarDays },
-  { value: 'monthly' as RankingPeriod, label: '월별', icon: Calendar },
-];
-
-export default function VisitRanking() {
-  const [restaurants, setRestaurants] = useState<VisitRankingRestaurant[]>([]);
+export default function AmealRanking() {
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState<RankingPeriod>('daily');
   const [selectedCategory, setSelectedCategory] = useState<FoodCategory | 'Random'>('Random');
 
-  const fetchRankings = async (period: RankingPeriod, category?: FoodCategory | 'Random') => {
+  const fetchRankings = async (category?: FoodCategory | 'Random') => {
     setError(null);
+
     try {
-      const params = new URLSearchParams({ period });
+      const params = new URLSearchParams();
       if (category && category !== 'Random') {
         params.append('category', category);
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/restaurants/rankings/visits?${params.toString()}`
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/restaurants?${params.toString()}`);
       if (!response.ok) {
         throw new Error(`${response.status} Error`);
       }
@@ -47,13 +39,8 @@ export default function VisitRanking() {
   };
 
   useEffect(() => {
-    fetchRankings(selectedPeriod, selectedCategory === 'Random' ? undefined : selectedCategory);
-  }, [selectedPeriod, selectedCategory]);
-
-  const getPeriodLabel = () => {
-    const option = PERIOD_OPTIONS.find((opt) => opt.value === selectedPeriod);
-    return option?.label || '일별';
-  };
+    fetchRankings(selectedCategory === 'Random' ? undefined : selectedCategory);
+  }, [selectedCategory]);
 
   if (error) {
     return (
@@ -62,7 +49,6 @@ export default function VisitRanking() {
         <Button
           onClick={() => {
             setError(null);
-            fetchRankings(selectedPeriod, selectedCategory === 'Random' ? undefined : selectedCategory);
           }}
           variant="secondary"
           className="mt-2"
@@ -77,32 +63,12 @@ export default function VisitRanking() {
     <div className="container mx-auto p-4 max-w-4xl">
       <header className="mb-8 pt-4">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">🏆 방문 랭킹</h1>
-          <p className="text-gray-600">{getPeriodLabel()} 인기 맛집을 확인해보세요</p>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">👑 아주한끼 가이드</h1>
+          <p className="text-gray-600">아주대 최고의 인기 맛집을 확인해보세요</p>
         </div>
       </header>
 
       <div className="flex flex-col gap-2 mb-3">
-        <div className="flex justify-center">
-          <div className="flex flex-1 space-x-1 bg-gray-100 p-1 rounded-lg">
-            {PERIOD_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => setSelectedPeriod(option.value)}
-                className={`flex-1 flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  selectedPeriod === option.value
-                    ? 'bg-white text-black shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                type="button"
-              >
-                <option.icon className="w-4 h-4 mr-2" />
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <Button
             variant={selectedCategory === 'Random' ? 'default' : 'outline'}
@@ -137,7 +103,7 @@ export default function VisitRanking() {
               <Card className="hover:shadow-md transition-shadow duration-200">
                 <CardContent>
                   <div className="flex justify-between items-start gap-4">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1">
                       <div className="flex items-start gap-4">
                         <div className="flex-shrink-0">
                           <Badge
@@ -158,6 +124,7 @@ export default function VisitRanking() {
 
                         <div className="flex flex-col gap-1 min-w-0 flex-1">
                           <h2 className="text-xl font-bold text-gray-800 mb-1 truncate">{restaurant.name}</h2>
+
                           <div className="flex items-center gap-2 text-xs text-gray-600">
                             <Utensils className="w-4 h-4 flex-shrink-0" />
                             <span className="truncate">{restaurant.category}</span>
@@ -168,30 +135,16 @@ export default function VisitRanking() {
                             <span className="truncate">{restaurant.address}</span>
                           </div>
 
-                          <div className="flex items-center mt-2 gap-2">
-                            {restaurant.avg_score > 0 && (
-                              <RatingDisplay rating={Math.round(restaurant.avg_score)} size="sm" />
-                            )}
-
-                            <div className="text-xs text-gray-500">
-                              <span>
-                                누적 방문 {restaurant.visit_count.toLocaleString()}회 • 리뷰 {restaurant.review_count}개
-                              </span>
-                            </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            <span>
+                              누적 방문 {restaurant.visit_count.toLocaleString()}회 • 리뷰 {restaurant.review_count}개
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-center">
-                      <div className="flex items-center gap-2">
-                        <Users className="w-5 h-5 text-blue-600" />
-                        <span className="text-2xl font-bold text-blue-600">
-                          {restaurant.period_visit_count.toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-500">{getPeriodLabel()} 방문</p>
-                    </div>
+                    <RatingDisplay rating={Math.round(restaurant.avg_score)} size="lg" />
                   </div>
                 </CardContent>
               </Card>

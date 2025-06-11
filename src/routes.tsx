@@ -4,6 +4,7 @@ import Home from '@/pages/Home';
 import NotFound from '@/pages/NotFound';
 import Detail from '@/pages/Detail';
 import VisitRanking from '@/pages/VisitRanking';
+import AmealRanking from './pages/AmealRanking';
 import Recommend from '@/pages/Recommend';
 import MyPage from '@/pages/MyPage';
 import AuthCallback from '@/pages/AuthCallback';
@@ -15,6 +16,7 @@ export default function AppRoutes() {
         <Route index element={<Home />} />
         <Route path="restaurant/:id" element={<Detail />} />
         <Route path="ranking" element={<VisitRanking />} />
+        <Route path="guide" element={<AmealRanking />} />
         <Route path="recommend" element={<Recommend />} />
         <Route path="mypage" element={<MyPage />} />
 
