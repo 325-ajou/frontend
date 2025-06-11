@@ -44,3 +44,7 @@ export const RATING_OPTIONS: RatingOption[] = [
   { label: '추천', emoji: '👍👍', description: '만족' },
   { label: '꼭 가세요', emoji: '👍👍👍', description: '매우 만족' },
 ];
+
+export const isAnonymousUser = (reviewer: string): boolean => {
+  return reviewer.includes('익명');
+};

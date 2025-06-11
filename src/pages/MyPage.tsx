@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router';
-import { User, MessageSquare, LogOut, Calendar, MapPin } from 'lucide-react';
+import { User, BadgeCheck, MessageSquare, LogOut, Calendar, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RatingDisplay } from '@/components/ui/rating-display';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { GoogleLoginButton } from '@/components/GoogleLoginButton';
 import { VisitTimeline } from '@/components/VisitTimeline';
 import { useAuth } from '@/contexts/AuthContext';
@@ -184,7 +185,25 @@ export default function MyPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold">{user ? user.user_name : `익명의 아주대생`}</h3>
+                {user ? (
+                  user.user_login_id ? (
+                    <div className="flex items-center space-x-1">
+                      <span className="text-lg font-semibold">{user.user_name}</span>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <BadgeCheck className="size-5 fill-[#0066b3] text-white" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>아주대생 인증</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  ) : (
+                    <span className="text-lg font-semibold">{user.user_name}</span>
+                  )
+                ) : (
+                  <span className="text-lg font-semibold">익명의 아주대생</span>
+                )}
                 {isLoggedIn && user && <p className="text-gray-600">@{user.user_login_id}</p>}
               </div>
               {isLoggedIn && (

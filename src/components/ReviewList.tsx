@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
+import { MessageSquare, Sparkles, BadgeCheck } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RatingDisplay } from '@/components/ui/rating-display';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import type { Review, ReviewResponse } from '@/types/review';
-import { MessageSquare, Sparkles } from 'lucide-react';
+import { isAnonymousUser } from '@/types/review';
 
 interface ReviewListProps {
   restaurantId: number;
@@ -124,7 +127,26 @@ export function ReviewList({ restaurantId, refreshTrigger, oneLineComment }: Rev
             <div key={review.review_id}>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
-                  <span className="font-medium text-gray-900">{review.reviewer}</span>
+                  <div className="flex items-center space-x-1">
+                    <span
+                      className={cn(
+                        'font-medium',
+                        isAnonymousUser(review.reviewer) ? 'text-gray-700' : 'text-gray-900'
+                      )}
+                    >
+                      {review.reviewer}
+                    </span>
+                    {!isAnonymousUser(review.reviewer) && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <BadgeCheck className="size-5 fill-[#0066b3] text-white" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>아주대생 인증</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
                   <RatingDisplay rating={review.score} size="sm" />
                 </div>
                 <span className="text-xs text-gray-500">{formatDate(review.created_at)}</span>
