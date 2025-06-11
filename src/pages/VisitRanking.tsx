@@ -16,13 +16,11 @@ const PERIOD_OPTIONS = [
 
 export default function VisitRanking() {
   const [restaurants, setRestaurants] = useState<RankingRestaurant[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<RankingPeriod>('daily');
   const [selectedCategory, setSelectedCategory] = useState<FoodCategory | 'Random'>('Random');
 
   const fetchRankings = async (period: RankingPeriod, category?: FoodCategory | 'Random') => {
-    setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams({ period });
@@ -45,8 +43,6 @@ export default function VisitRanking() {
         setError('데이터를 불러오는 중 알 수 없는 오류가 발생했습니다.');
       }
       setRestaurants([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -58,14 +54,6 @@ export default function VisitRanking() {
     const option = PERIOD_OPTIONS.find((opt) => opt.value === selectedPeriod);
     return option?.label || '일별';
   };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-md text-muted-foreground">랭킹 정보를 불러오는 중...</p>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -94,26 +82,27 @@ export default function VisitRanking() {
         </div>
       </header>
 
-      <div className="mb-6">
-        <div className="flex justify-center gap-2">
-          {PERIOD_OPTIONS.map((option) => {
-            const IconComponent = option.icon;
-            return (
-              <Button
+      <div className="flex flex-col gap-2 mb-3">
+        <div className="flex justify-center">
+          <div className="flex flex-1 space-x-1 bg-gray-100 p-1 rounded-lg">
+            {PERIOD_OPTIONS.map((option) => (
+              <button
                 key={option.value}
-                variant={selectedPeriod === option.value ? 'default' : 'outline'}
                 onClick={() => setSelectedPeriod(option.value)}
-                className="flex items-center gap-2"
+                className={`flex-1 flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  selectedPeriod === option.value
+                    ? 'bg-white text-black shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                type="button"
               >
-                <IconComponent className="w-4 h-4" />
+                <option.icon className="w-4 h-4 mr-2" />
                 {option.label}
-              </Button>
-            );
-          })}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="mb-8">
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <Button
             variant={selectedCategory === 'Random' ? 'default' : 'outline'}
