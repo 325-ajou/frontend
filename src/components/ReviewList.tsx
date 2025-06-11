@@ -125,12 +125,12 @@ export function ReviewList({ restaurantId, refreshTrigger, oneLineComment }: Rev
         <CardContent className="flex flex-col space-y-6">
           {reviews.map((review) => (
             <div key={review.review_id}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-3">
+              <div className="flex justify-between mb-3">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mr-2 max-w-1/2">
                   <div className="flex items-center space-x-1">
                     <span
                       className={cn(
-                        'font-medium',
+                        'font-medium text-nowrap',
                         isAnonymousUser(review.reviewer) ? 'text-gray-700' : 'text-gray-900'
                       )}
                     >
@@ -149,7 +149,7 @@ export function ReviewList({ restaurantId, refreshTrigger, oneLineComment }: Rev
                   </div>
                   <RatingDisplay rating={review.score} size="sm" />
                 </div>
-                <span className="text-xs text-gray-500">{formatDate(review.created_at)}</span>
+                <span className="mt-1 text-xs text-gray-500">{formatDate(review.created_at)}</span>
               </div>
               <p className="text-gray-700 leading-relaxed">{review.comment}</p>
             </div>
